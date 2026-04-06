@@ -38,6 +38,7 @@ pipeline {
             post {
                 always {
                     sh "docker stop test-app && docker rm test-app"
+                    archiveArtifacts artifacts: "${IMAGE_NAME}-report.html", allowEmptyArchive: true, fingerprint: true
                 }
             }
         }

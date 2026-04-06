@@ -25,7 +25,15 @@ pipeline {
                 echo "Running DAST scan on ${IMAGE_NAME}:${FULL_TAG} ..."
                 sh "docker run -d --name test-app -p 3000:3000 ${IMAGE_NAME}:${FULL_TAG}"
                     
-                sh "docker run --rm --network='host' bkimminich/zaproxy-stable zap-baseline.py -t http://localhost:3000 -r ${IMAGE_NAME}-report.html"
+                sh """
+                    docker run --rm --network='host' \
+                    -v "${WORKSPACE}":/zap/wrk/:rw \
+                    -u root \
+                    ghcr.io/zaproxy/zaproxy:stable zap-baseline.py \
+                    -t http://localhost:3000 \
+                    -r /zap/wrk/${IMAGE_NAME}-report.html \
+                    -I
+                """
             }
             post {
                 always {

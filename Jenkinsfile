@@ -1,13 +1,21 @@
 pipeline {
     agent any
-    tools {
-        nodejs 'nodejs18' // Must match the name in Jenkins Global Tool Configuration
+    environment {
+        IMAGE_NAME = "supreme-waffle"
+        DOckER_BUILDKIT = 1
     }
     stages {
-        stage('Install Dependencies') {
+        stage('Docker Build') {
             steps {
-                echo "Starting npm ci at 14:00:00"
-                sh 'npm ci'
+                echo "Building image ..."
+                sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                echo "Checking for vulnerabilities ..."
+                sh 'docker run -v /var/run/docker.sock:/var/run/docker.sock \
+                    aquasec/trivy image supreme-waffle:${BUILD_NUMBER}'
             }
         }
     }

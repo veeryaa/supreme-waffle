@@ -3,7 +3,6 @@ pipeline {
     environment {
         IMAGE_NAME = "supreme-waffle"
         TRIVY_VERSION = "0.69.3"
-        DOCKER_BUILDKIT = "1"
         TAG_PREFIX = "${BRANCH_NAME == 'main' ? 'v1.0.0' : (BRANCH_NAME == 'develop' ? 'dev' : BRANCH_NAME)}"
         FULL_TAG = "${TAG_PREFIX}-${BUILD_NUMBER}"
     }

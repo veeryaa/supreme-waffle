@@ -30,7 +30,6 @@ pipeline {
             post {
                 always {
                     sh "docker stop test-app && docker rm test-app"
-                    archive artifacts: "${IMAGE_NAME}-report.html", fingerprint: true
                 }
             }
         }

@@ -3,20 +3,22 @@ pipeline {
     environment {
         IMAGE_NAME = "supreme-waffle"
         TRIVY_VERSION = "0.69.3"
-        DOckER_BUILDKIT = 1
+        DOCKER_BUILDKIT = "1"
+        TAG_PREFIX = "${BRANCH_NAME == 'main' ? 'v1.0.0' : (BRANCH_NAME == 'develop' ? 'dev' : BRANCH_NAME)}"
+        FULL_TAG = "${TAG_PREFIX}-${BUILD_NUMBER}"
     }
     stages {
         stage('Docker Build') {
             steps {
-                echo "Building image ..."
-                sh "docker build -t ${IMAGE_NAME}:${BUILD_NUMBER} ."
+                echo "Building image at ..."
+                sh "docker build -t ${IMAGE_NAME}:${FULL_TAG} ."
             }
         }
         stage('Security Scan') {
             steps {
-                echo "Checking for vulnerabilities ..."
+                echo "Scanning ${IMAGE_NAME}:${FULL_TAG} ..."
                 sh "docker run -v /var/run/docker.sock:/var/run/docker.sock \
-                    aquasec/trivy:${TRIVY_VERSION} image supreme-waffle:${BUILD_NUMBER}"
+                    aquasec/trivy:${TRIVY_VERSION} image ${IMAGE_NAME}:${FULL_TAG}"
             }
         }
     }
